@@ -1,20 +1,104 @@
-"use client";
-import Seat from "@/components/Seat";
+'use client';
+
+import { useState } from "react";
+import SeatGrid from "../components/SeatGrid";
+import { Seat } from "@/types";
 
 export default function Home() {
+  const [seats] = useState<Seat[]>(
+    Array.from({ length: 60 }, (_, index) => {
+      const row = String.fromCharCode(65 + Math.floor(index / 10));
+      const col = (index % 10) + 1;
+      const id = `${row}${col}`;
+      const price =
+        Math.floor(index / 20) === 0
+          ? 100
+          : Math.floor(index / 20) === 1
+          ? 150
+          : 200;
+
+      return { id, price };
+    })
+  );
+
+  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+
+  const handleSeatSelect = (id: string) => {
+    setSelectedSeats((prev) => {
+      const alreadySelected = prev.includes(id);
+
+      if (alreadySelected) {
+        return prev.filter((seatId) => seatId !== id);
+      }
+
+      if (prev.length >= 8) {
+        alert("You can only select up to 8 seats.");
+        return prev;
+      }
+
+      return [...prev, id];
+    });
+  };
+
+  const totalCost = selectedSeats.reduce((total, id) => {
+    const seat = seats.find((seat) => seat.id === id);
+    return total + (seat ? seat.price : 0);
+  }, 0);
+
   return (
-    <div className="min-h-screen bg-gray-500 flex flex-col items-center p-4">
-      <h1 className="text-2xl font-bold mb-4">Interactive Seat Booking System</h1>
-      <div className="w-full max-w-4xl bg-white shadow rounded-lg p-6">
-        <Seat
-          id="A1"
-          price={100}
-          isSelected={false}
-          onSelect={(id: string) => console.log(id)}
+    <div className="min-h-screen bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200 flex flex-col items-center p-6">
+      <h1 className="text-4xl font-bold text-gray-800 mb-6">
+        Interactive Seat Booking System
+      </h1>
+      {/* Legend Section */}
+      <div className="flex justify-between items-center w-full max-w-4xl mb-8 px-4">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center">
+            <div className="w-6 h-6 bg-blue-400 rounded-md mr-2 shadow-md"></div>
+            <span className="text-lg font-medium text-gray-700">
+              Silver (₹100)
+            </span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-6 h-6 bg-yellow-400 rounded-md mr-2 shadow-md"></div>
+            <span className="text-lg font-medium text-gray-700">
+              Gold (₹150)
+            </span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-6 h-6 bg-red-400 rounded-md mr-2 shadow-md"></div>
+            <span className="text-lg font-medium text-gray-700">
+              Platinum (₹200)
+            </span>
+          </div>
+        </div>
+      </div>
+      {/* Seat Grid */}
+      <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-8">
+        <SeatGrid
+          seats={seats}
+          selectedSeats={selectedSeats}
+          onSeatSelect={handleSeatSelect}
         />
-        <div id="seat-grid" className="mb-6"></div>
-        {/* summary component */}
-        <div id="summary"></div>
+        {/* Booking Summary */}
+        <div className="mt-8 p-6 border rounded-lg bg-gray-100 shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800">
+            Selected Seats:
+          </h2>
+          <p className="text-lg text-gray-600 mt-2">
+            {selectedSeats.join(", ") || "None"}
+          </p>
+          <h2 className="text-xl font-semibold text-gray-800 mt-6">
+            Total Cost:
+          </h2>
+          <p className="text-lg text-gray-600 mt-2">₹{totalCost}</p>
+          <button
+            className="mt-6 px-6 py-3 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white font-bold rounded-md shadow-md hover:from-green-500 hover:to-green-700"
+            disabled={selectedSeats.length === 0}
+          >
+            Book Now
+          </button>
+        </div>
       </div>
     </div>
   );
