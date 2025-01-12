@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
 import { useState } from "react";
+import { Toaster, toast } from "react-hot-toast";
 import SeatGrid from "../components/SeatGrid";
 import { Seat } from "@/types";
 
@@ -32,12 +33,25 @@ export default function Home() {
       }
 
       if (prev.length >= 8) {
-        alert("You can only select up to 8 seats.");
+        toast.error("You can only select up to 8 seats.");
         return prev;
       }
 
       return [...prev, id];
     });
+  };
+
+  const handleBooking = () => {
+    if (selectedSeats.length === 0) {
+      toast.error("Please select at least one seat before booking!");
+    } else {
+      toast.success(
+        `Booking confirmed! Seats: ${selectedSeats.join(
+          ", "
+        )}. Total: ₹${totalCost}.`
+      );
+      setSelectedSeats([]);
+    }
   };
 
   const totalCost = selectedSeats.reduce((total, id) => {
@@ -47,25 +61,25 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200 flex flex-col items-center p-6">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">
+      <Toaster position="top-center" reverseOrder={false} />
+      <h1 className="text-4xl font-bold text-gray-800 mb-6 text-center sm:text-3xl">
         Interactive Seat Booking System
       </h1>
-      {/* Legend Section */}
-      <div className="flex justify-between items-center w-full max-w-4xl mb-8 px-4">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center">
+      <div className="flex flex-wrap justify-between items-center w-full max-w-4xl mb-8 px-4">
+        <div className="flex flex-wrap justify-start items-center gap-6 sm:gap-4">
+          <div className="flex items-center text-sm sm:text-base">
             <div className="w-6 h-6 bg-blue-400 rounded-md mr-2 shadow-md"></div>
             <span className="text-lg font-medium text-gray-700">
               Silver (₹100)
             </span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center text-sm sm:text-base">
             <div className="w-6 h-6 bg-yellow-400 rounded-md mr-2 shadow-md"></div>
             <span className="text-lg font-medium text-gray-700">
               Gold (₹150)
             </span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center text-sm sm:text-base">
             <div className="w-6 h-6 bg-red-400 rounded-md mr-2 shadow-md"></div>
             <span className="text-lg font-medium text-gray-700">
               Platinum (₹200)
@@ -73,14 +87,14 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {/* Seat Grid */}
-      <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-8">
+
+      {/* seat grid and booking details */}
+      <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6">
         <SeatGrid
           seats={seats}
           selectedSeats={selectedSeats}
           onSeatSelect={handleSeatSelect}
         />
-        {/* Booking Summary */}
         <div className="mt-8 p-6 border rounded-lg bg-gray-100 shadow-md">
           <h2 className="text-xl font-semibold text-gray-800">
             Selected Seats:
@@ -93,8 +107,8 @@ export default function Home() {
           </h2>
           <p className="text-lg text-gray-600 mt-2">₹{totalCost}</p>
           <button
-            className="mt-6 px-6 py-3 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white font-bold rounded-md shadow-md hover:from-green-500 hover:to-green-700"
-            disabled={selectedSeats.length === 0}
+            onClick={handleBooking}
+            className="mt-6 px-6 py-3 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white font-bold rounded-md shadow-md hover:from-green-500 hover:to-green-700 w-full sm:w-auto"
           >
             Book Now
           </button>

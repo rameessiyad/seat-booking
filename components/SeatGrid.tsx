@@ -9,7 +9,7 @@ export default function SeatGrid({
   onSeatSelect,
 }: SeatGridProps) {
   return (
-    <div className="grid grid-cols-10 gap-3 p-4 bg-gray-50 border rounded-lg shadow-sm">
+    <div className="grid grid-cols-10 gap-2 sm:gap-3 p-4 bg-gray-50 border rounded-lg shadow-sm">
       {seats.map((seat) => (
         <Seat
           key={seat.id}
